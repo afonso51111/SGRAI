@@ -1,0 +1,148 @@
+{
+  "_info": "Layout da cozinha LaPrizza. Unidade: 1 = 1 metro. Rotações em graus [x, y, z]. A frente de cada modelo está virada para +Z antes da rotação.",
+
+  "scene": { "background": "#1b1b1f", "environmentIntensity": 0.55 },
+
+  "kitchen": {
+    "width": 10,
+    "depth": 8,
+    "height": 3.2,
+    "floorMaterial": "floorTiles",
+    "wallMaterial": "brickWall"
+  },
+
+  "camera": {
+    "fov": 50,
+    "near": 0.1,
+    "far": 100,
+    "position": [6.5, 6, 8.5],
+    "limits": {
+      "minDistance": 1.5,
+      "maxDistance": 16,
+      "minPolarAngle": 5,
+      "maxPolarAngle": 85,
+      "panMargin": 0.5,
+      "maxTargetHeight": 1.5
+    }
+  },
+
+  "materials": {
+    "floorTiles": {"color": "#ffffff", "roughness": 1, "metalness": 0, "repeat": [5, 4], "maps": {"map": "textures/floor/color.jpg", "normalMap": "textures/floor/normal.jpg", "roughnessMap": "textures/floor/roughness.jpg"}},
+    "brickWall": {"color": "#ffffff", "roughness": 1, "metalness": 0, "repeat": [8, 2.6], "maps": {"map": "textures/walls/color.jpg", "normalMap": "textures/walls/normal.jpg", "roughnessMap": "textures/walls/roughness.jpg"}},
+    "wood": {"color": "#ffffff", "roughness": 1, "metalness": 0, "maps": {"map": "textures/wood/color.jpg", "normalMap": "textures/wood/normal.jpg", "roughnessMap": "textures/wood/roughness.jpg"}, "repeat": [1, 1]},
+    "woodCounter": {"color": "#f2e4d2", "roughness": 1, "metalness": 0, "repeat": [2, 0.5], "maps": {"map": "textures/wood/color.jpg", "normalMap": "textures/wood/normal.jpg", "roughnessMap": "textures/wood/roughness.jpg"}},
+    "ovenBrick": {"color": "#ffffff", "roughness": 1, "metalness": 0, "repeat": [1.5, 0.35], "maps": {"map": "textures/oven_brick/color.jpg", "normalMap": "textures/oven_brick/normal.jpg", "roughnessMap": "textures/oven_brick/roughness.jpg"}},
+    "ovenDome": {"color": "#ffffff", "roughness": 1, "metalness": 0, "repeat": [4, 1.5], "maps": {"map": "textures/oven_dome/color.jpg", "normalMap": "textures/oven_dome/normal.jpg", "roughnessMap": "textures/oven_dome/roughness.jpg"}},
+    "belt": {"color": "#bbbbbb", "roughness": 1, "metalness": 0, "repeat": [11, 1], "maps": {"map": "textures/belt/color.jpg", "normalMap": "textures/belt/normal.jpg", "roughnessMap": "textures/belt/roughness.jpg"}},
+    "fire": {"color": "#ffffff", "roughness": 1, "metalness": 0, "emissive": "#ffffff", "emissiveIntensity": 1.6, "maps": {"map": "textures/fire/color.jpg", "normalMap": "textures/fire/normal.jpg", "roughnessMap": "textures/fire/roughness.jpg", "emissiveMap": "textures/fire/emission.jpg"}, "repeat": [1, 1]},
+    "charcoal": {"color": "#ffffff", "roughness": 1, "metalness": 0, "emissive": "#ffffff", "emissiveIntensity": 0.8, "repeat": [2, 2], "maps": {"map": "textures/embers/color.jpg", "normalMap": "textures/embers/normal.jpg", "roughnessMap": "textures/embers/roughness.jpg", "emissiveMap": "textures/embers/emission.jpg"}},
+    "stainless": {"color": "#ffffff", "roughness": 1, "metalness": 0.75, "maps": {"map": "textures/stainless/color.jpg", "normalMap": "textures/stainless/normal.jpg", "roughnessMap": "textures/stainless/roughness.jpg", "metalnessMap": "textures/stainless/metalness.jpg"}, "repeat": [1, 1]},
+    "stainlessTop": {"color": "#f4f5f7", "roughness": 1, "metalness": 0.75, "repeat": [6, 1], "maps": {"map": "textures/stainless/color.jpg", "normalMap": "textures/stainless/normal.jpg", "roughnessMap": "textures/stainless/roughness.jpg", "metalnessMap": "textures/stainless/metalness.jpg"}},
+    "stainlessDouble": {"color": "#ffffff", "roughness": 1, "metalness": 0.75, "side": "double", "flatShading": true, "repeat": [2, 1], "maps": {"map": "textures/stainless/color.jpg", "normalMap": "textures/stainless/normal.jpg", "roughnessMap": "textures/stainless/roughness.jpg", "metalnessMap": "textures/stainless/metalness.jpg"}},
+    "darkSteel": {"color": "#ffffff", "roughness": 1, "metalness": 1, "maps": {"map": "textures/dark_steel/color.jpg", "normalMap": "textures/dark_steel/normal.jpg", "roughnessMap": "textures/dark_steel/roughness.jpg", "metalnessMap": "textures/dark_steel/metalness.jpg"}, "repeat": [1, 1]},
+    "robotPaint": {"color": "#ffffff", "roughness": 1, "metalness": 1, "maps": {"map": "textures/robot_paint/color.jpg", "normalMap": "textures/robot_paint/normal.jpg", "roughnessMap": "textures/robot_paint/roughness.jpg", "metalnessMap": "textures/robot_paint/metalness.jpg"}, "repeat": [1, 1]},
+    "lampShade": {"color": "#ffffff", "roughness": 1, "metalness": 0, "side": "double", "maps": {"map": "textures/plastic_black/color.jpg", "normalMap": "textures/plastic_black/normal.jpg", "roughnessMap": "textures/plastic_black/roughness.jpg"}, "repeat": [1, 1]},
+    "dough": {"color": "#efcf9c", "roughness": 1, "metalness": 0, "maps": {"map": "textures/dough/color.jpg", "normalMap": "textures/dough/normal.jpg", "roughnessMap": "textures/dough/roughness.jpg"}, "repeat": [1, 1]},
+    "fryerOil": {"color": "#b07a1a", "roughness": 0.25, "metalness": 0, "maps": {"map": "textures/plastic_white/color.jpg", "normalMap": "textures/plastic_white/normal.jpg", "roughnessMap": "textures/plastic_white/roughness.jpg"}, "repeat": [1, 1]},
+    "ledGreen": {"color": "#114422", "roughness": 1, "metalness": 0, "emissive": "#33ff66", "emissiveIntensity": 2, "maps": {"map": "textures/plastic_white/color.jpg", "normalMap": "textures/plastic_white/normal.jpg", "roughnessMap": "textures/plastic_white/roughness.jpg"}, "repeat": [1, 1]},
+    "bulb": {"color": "#ffffff", "roughness": 1, "metalness": 0, "emissive": "#fff3d0", "emissiveIntensity": 3, "maps": {"map": "textures/plastic_white/color.jpg", "normalMap": "textures/plastic_white/normal.jpg", "roughnessMap": "textures/plastic_white/roughness.jpg"}, "repeat": [1, 1]},
+    "ingredientTomato": {"color": "#c62828", "roughness": 1, "metalness": 0, "maps": {"map": "textures/plastic_white/color.jpg", "normalMap": "textures/plastic_white/normal.jpg", "roughnessMap": "textures/plastic_white/roughness.jpg"}, "repeat": [1, 1]},
+    "ingredientMozzarella": {"color": "#f5f0e1", "roughness": 1, "metalness": 0, "maps": {"map": "textures/plastic_white/color.jpg", "normalMap": "textures/plastic_white/normal.jpg", "roughnessMap": "textures/plastic_white/roughness.jpg"}, "repeat": [1, 1]},
+    "ingredientHam": {"color": "#e89a9a", "roughness": 1, "metalness": 0, "maps": {"map": "textures/plastic_white/color.jpg", "normalMap": "textures/plastic_white/normal.jpg", "roughnessMap": "textures/plastic_white/roughness.jpg"}, "repeat": [1, 1]},
+    "ingredientMushroom": {"color": "#a1887f", "roughness": 1, "metalness": 0, "maps": {"map": "textures/plastic_white/color.jpg", "normalMap": "textures/plastic_white/normal.jpg", "roughnessMap": "textures/plastic_white/roughness.jpg"}, "repeat": [1, 1]},
+    "ingredientOlive": {"color": "#2e2a24", "roughness": 1, "metalness": 0, "maps": {"map": "textures/plastic_white/color.jpg", "normalMap": "textures/plastic_white/normal.jpg", "roughnessMap": "textures/plastic_white/roughness.jpg"}, "repeat": [1, 1]},
+    "ingredientBasil": {"color": "#2e7d32", "roughness": 1, "metalness": 0, "maps": {"map": "textures/plastic_white/color.jpg", "normalMap": "textures/plastic_white/normal.jpg", "roughnessMap": "textures/plastic_white/roughness.jpg"}, "repeat": [1, 1]}
+  },
+
+  "_modelsInfo": "Modelos importados (.glb/.gltf). Para usar: põe o ficheiro em public/models/, acrescenta aqui { \"chave\": { \"url\": \"models/ficheiro.glb\", \"scale\": 1 } } e um objeto com \"type\": \"model\", \"model\": \"chave\".",
+  "models": {},
+
+  "objects": [
+    { "id": "assemblyCounter", "type": "counter",
+      "position": [0, 0, -3.2], "rotation": [0, 0, 0],
+      "params": { "width": 8.6, "depth": 1.6, "height": 0.9, "doors": 12 },
+      "materials": { "top": "stainlessTop" } },
+
+    { "id": "receivingPlatform", "type": "receivingPlatform",
+      "position": [-3.3, 0.9, -3.15],
+      "params": { "width": 0.6, "depth": 0.6 } },
+
+    { "id": "dispenser", "type": "dispenser",
+      "position": [-3.3, 0.9, -3.15],
+      "params": { "tubeRadius": 0.24, "tubeHeight": 0.8, "clearance": 0.45, "postOffset": 0.7, "crustCount": 10 } },
+
+    { "id": "conveyor", "type": "conveyor",
+      "position": [-0.15, 0.9, -3.15],
+      "params": { "length": 5.5, "width": 0.55, "height": 0.18 } },
+
+    { "id": "armTomato", "type": "roboticArm", "position": [-2.3, 0.9, -3.75],
+      "params": { "ingredient": "tomato" }, "materials": { "ingredient": "ingredientTomato" } },
+    { "id": "armMozzarella", "type": "roboticArm", "position": [-1.45, 0.9, -3.75],
+      "params": { "ingredient": "mozzarella" }, "materials": { "ingredient": "ingredientMozzarella" } },
+    { "id": "armHam", "type": "roboticArm", "position": [-0.6, 0.9, -3.75],
+      "params": { "ingredient": "ham" }, "materials": { "ingredient": "ingredientHam" } },
+    { "id": "armMushroom", "type": "roboticArm", "position": [0.25, 0.9, -3.75],
+      "params": { "ingredient": "mushrooms" }, "materials": { "ingredient": "ingredientMushroom" } },
+    { "id": "armOlive", "type": "roboticArm", "position": [1.1, 0.9, -3.75],
+      "params": { "ingredient": "olives" }, "materials": { "ingredient": "ingredientOlive" } },
+    { "id": "armBasil", "type": "roboticArm", "position": [1.95, 0.9, -3.75],
+      "params": { "ingredient": "basil" }, "materials": { "ingredient": "ingredientBasil" } },
+
+    { "id": "woodOven", "type": "woodOven",
+      "position": [3.4, 0.9, -3.2], "rotation": [0, -90, 0],
+      "params": { "radius": 0.72, "baseWidth": 1.6, "baseDepth": 1.5, "serviceMouth": true, "serviceDoorAngle": 70 } },
+
+    { "id": "deepFryer", "type": "deepFryer", "position": [4.6, 0, -1.6], "rotation": [0, -90, 0],
+      "params": { "width": 0.8, "depth": 0.8, "height": 0.9 } },
+    { "id": "griddle", "type": "griddle", "position": [4.6, 0, -0.7], "rotation": [0, -90, 0],
+      "params": { "width": 1.0, "depth": 0.8, "height": 0.9 } },
+    { "id": "grill", "type": "grill", "position": [4.6, 0, 0.3], "rotation": [0, -90, 0],
+      "params": { "width": 1.0, "depth": 0.8, "height": 0.9 } },
+    { "id": "sideCounterRight", "type": "counter", "position": [4.6, 0, 1.4], "rotation": [0, -90, 0],
+      "params": { "width": 1.2, "depth": 0.8, "height": 0.9 } },
+    { "id": "exhaustHood", "type": "exhaustHood", "position": [4.5, 2.0, -0.6], "rotation": [0, -90, 0],
+      "params": { "width": 2.8, "depth": 1.0, "height": 0.5, "ductHeight": 0.6 } },
+
+    { "id": "refrigerator", "type": "refrigerator", "position": [-4.6, 0, -1.3], "rotation": [0, 90, 0],
+      "params": { "width": 1.3, "depth": 0.8, "height": 2.0 } },
+    { "id": "sideCounterLeft", "type": "counter", "position": [-4.65, 0, 0.2], "rotation": [0, 90, 0],
+      "params": { "width": 1.4, "depth": 0.7, "height": 0.9 } },
+    { "id": "dishwasher", "type": "dishwasher", "position": [-4.675, 0, 1.2], "rotation": [0, 90, 0],
+      "params": { "width": 0.6, "depth": 0.65, "height": 0.88 } },
+    { "id": "wallShelf", "type": "wallShelf", "position": [-4.85, 1.5, 0.2], "rotation": [0, 90, 0],
+      "params": { "width": 1.4, "depth": 0.3, "levels": 2, "spacing": 0.45 } },
+
+    { "id": "prepTable", "type": "table", "position": [0, 0, 0.8],
+      "params": { "width": 2.4, "depth": 1.1, "height": 0.9 } },
+
+    { "id": "peel", "type": "cookingTool", "position": [-0.65, 0.9, 0.55], "rotation": [0, 25, 0], "params": { "kind": "peel" } },
+    { "id": "rollingPin", "type": "cookingTool", "position": [0.15, 0.9, 1.0], "rotation": [0, -15, 0], "params": { "kind": "rollingPin" } },
+    { "id": "bowl", "type": "cookingTool", "position": [0.75, 0.9, 0.55], "params": { "kind": "bowl", "radius": 0.15 } },
+    { "id": "cutter", "type": "cookingTool", "position": [0.45, 0.9, 1.1], "rotation": [0, 70, 0], "params": { "kind": "cutter" } },
+    { "id": "tray1", "type": "cookingTool", "position": [-0.05, 0.9, 0.5], "params": { "kind": "pizzaTray" } },
+    { "id": "tray2", "type": "cookingTool", "position": [-0.05, 0.91, 0.5], "params": { "kind": "pizzaTray" } },
+    { "id": "panShelf1", "type": "cookingTool", "position": [-4.85, 1.515, -0.15], "rotation": [0, 90, 0], "params": { "kind": "pan" } },
+    { "id": "panShelf2", "type": "cookingTool", "position": [-4.85, 1.515, 0.45], "rotation": [0, 90, 0], "params": { "kind": "pan", "radius": 0.14 } },
+    { "id": "bowlShelf", "type": "cookingTool", "position": [-4.85, 1.965, 0.2], "params": { "kind": "bowl", "radius": 0.12 } },
+    { "id": "panGriddle", "type": "cookingTool", "position": [4.6, 0.93, -0.7], "rotation": [0, 160, 0], "params": { "kind": "pan", "radius": 0.15 } },
+
+    { "id": "lampLineLeft", "type": "pendantLamp", "position": [-1.9, 3.2, -2.7], "params": { "cord": 0.45 }, "castShadow": false },
+    { "id": "lampLineRight", "type": "pendantLamp", "position": [1.9, 3.2, -2.7], "params": { "cord": 0.45 }, "castShadow": false },
+    { "id": "lampTable", "type": "pendantLamp", "position": [0, 3.2, 0.8], "params": { "cord": 0.45 }, "castShadow": false }
+  ],
+
+  "lights": [
+    { "name": "Luz ambiente", "type": "ambient", "color": "#fff3e0", "intensity": 0.6, "on": true },
+    { "name": "Luz hemisférica (enchimento)", "type": "hemisphere", "color": "#fff8f0", "groundColor": "#5a4636", "intensity": 0.5, "on": true },
+    { "name": "Spot - Linha (esquerda)", "type": "spot", "color": "#fff1dc", "intensity": 45,
+      "position": [-1.9, 2.55, -2.7], "target": [-1.9, 0.9, -3.2], "angle": 55, "penumbra": 0.45, "castShadow": true, "on": true },
+    { "name": "Spot - Linha (direita)", "type": "spot", "color": "#fff1dc", "intensity": 45,
+      "position": [1.9, 2.55, -2.7], "target": [1.9, 0.9, -3.2], "angle": 55, "penumbra": 0.45, "castShadow": true, "on": true },
+    { "name": "Spot - Mesa central", "type": "spot", "color": "#fff1dc", "intensity": 40,
+      "position": [0, 2.55, 0.8], "target": [0, 0, 0.8], "angle": 55, "penumbra": 0.5, "castShadow": true, "on": true },
+    { "name": "Spot - Exaustor", "type": "spot", "color": "#ffffff", "intensity": 25,
+      "position": [4.4, 1.97, -0.6], "target": [4.4, 0, -0.6], "angle": 70, "penumbra": 0.6, "castShadow": true, "on": true },
+    { "name": "Fogo do forno", "type": "point", "color": "#ff7a26", "intensity": 4, "distance": 3,
+      "position": [2.45, 1.15, -3.2], "castShadow": false, "on": true }
+  ]
+}

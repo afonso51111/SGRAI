@@ -1,0 +1,42 @@
+html,
+body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  background: #1b1b1f;
+  font-family: system-ui, sans-serif;
+}
+
+canvas {
+  display: block;
+}
+
+#loading {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: #eee;
+  font-size: 1.4rem;
+  background: #1b1b1f;
+  z-index: 10;
+  transition: opacity 0.4s;
+}
+
+#loading.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+#help {
+  position: fixed;
+  left: 12px;
+  bottom: 12px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.55);
+  color: #eee;
+  font-size: 12px;
+  line-height: 1.5;
+  pointer-events: none;
+}

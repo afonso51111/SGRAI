@@ -1,0 +1,18 @@
+{
+  "name": "laprizza-3d",
+  "private": true,
+  "version": "0.2.0",
+  "description": "SGRAI 2026/27 - Cozinha LaPrizza em 3D (Three.js)",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "three": "^0.187.0"
+  },
+  "devDependencies": {
+    "vite": "^8.3.8"
+  }
+}

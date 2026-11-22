@@ -37,6 +37,47 @@ function named(obj, name) {
   return obj;
 }
 
+/** Gerador pseudo-aleatório determinístico (a mesma semente dá sempre a mesma cena). */
+function rng(seed = 1) {
+  let a = seed >>> 0;
+  return () => {
+    a = (a + 0x6d2b79f5) >>> 0;
+    let t = a;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+/** Muitas cópias da mesma geometria num único draw call. `matrices` = lista de THREE.Matrix4. */
+function instanced(geo, mat, matrices) {
+  const im = new THREE.InstancedMesh(geo, mat, matrices.length);
+  matrices.forEach((mx, i) => im.setMatrixAt(i, mx));
+  im.instanceMatrix.needsUpdate = true;
+  return im;
+}
+
+/**
+ * Espalha `count` elementos em espiral (ângulo de ouro) num disco de raio R.
+ * size = escala [x, y, z]; tiltX roda cada elemento (ex.: PI/2 para deitar um torus).
+ */
+function scatter(count, R, rnd, y, [sx, sy, sz], phase = 0, tiltX = 0) {
+  const o = new THREE.Object3D();
+  o.rotation.order = 'YXZ'; // primeiro deita (tiltX), depois roda sobre o eixo vertical
+  const out = [];
+  for (let k = 0; k < count; k++) {
+    const r = R * Math.sqrt((k + 0.5) / count);
+    const a = phase + k * 2.39996 + (rnd() - 0.5) * 0.4;
+    const s = 0.85 + rnd() * 0.3;
+    o.position.set(Math.cos(a) * r, y, Math.sin(a) * r);
+    o.rotation.set(tiltX, rnd() * Math.PI * 2, 0);
+    o.scale.set(sx * s, sy * s, sz * s);
+    o.updateMatrix();
+    out.push(o.matrix.clone());
+  }
+  return out;
+}
+
 /** Botões rotativos na frente de um equipamento. */
 function knobs(g, count, width, y, z, mat) {
   for (let i = 0; i < count; i++) {
@@ -56,11 +97,27 @@ function applianceBody(g, w, h, d, m) {
 // ---------- mobiliário ----------
 
 export function counter(p, m) {
-  const { width = 2, depth = 0.7, height = 0.9, topThickness = 0.05, doors = Math.max(1, Math.round(width / 0.6)) } = p;
+  const {
+    width = 2,
+    depth = 0.7,
+    height = 0.9,
+    topThickness = 0.05,
+    doors = Math.max(1, Math.round(width / 0.6)),
+    niche = null, // { center, width }: nicho aberto (sem corpo nem portas), em x local — usado para a lenha
+  } = p;
   const g = new THREE.Group();
   const bodyH = height - topThickness - 0.1;
   g.add(at(box(width - 0.04, 0.1, depth - 0.1, m('kick', 'darkSteel')), 0, 0.05, -0.03));
-  g.add(at(box(width, bodyH, depth - 0.04, m('body', 'stainless')), 0, 0.1 + bodyH / 2, -0.02));
+  const bodyMat = m('body', 'stainless');
+  const nL = niche ? niche.center - niche.width / 2 : 0;
+  const nR = niche ? niche.center + niche.width / 2 : 0;
+  if (niche) {
+    for (const [a, b] of [[-width / 2, nL], [nR, width / 2]]) {
+      if (b - a > 0.01) g.add(at(box(b - a, bodyH, depth - 0.04, bodyMat), (a + b) / 2, 0.1 + bodyH / 2, -0.02));
+    }
+  } else {
+    g.add(at(box(width, bodyH, depth - 0.04, bodyMat), 0, 0.1 + bodyH / 2, -0.02));
+  }
   g.add(at(box(width + 0.02, topThickness, depth, m('top', 'woodCounter')), 0, height - topThickness / 2, 0));
 
   // portas e puxadores
@@ -68,6 +125,7 @@ export function counter(p, m) {
   const handleMat = m('handle', 'darkSteel');
   for (let i = 0; i < doors; i++) {
     const x = -width / 2 + doorW * (i + 0.5);
+    if (niche && x + doorW / 2 > nL && x - doorW / 2 < nR) continue; // não há portas à frente do nicho
     g.add(at(box(doorW - 0.02, bodyH - 0.04, 0.015, m('door', 'stainless')), x, 0.1 + bodyH / 2, depth / 2 - 0.03));
     const h = cyl(0.008, 0.008, Math.min(0.3, doorW * 0.5), handleMat, 8);
     h.rotation.z = Math.PI / 2;
@@ -141,9 +199,15 @@ export function dispenser(p, m) {
   // pilha de massas (o sprint 3 vai largá-las uma a uma)
   const crusts = named(new THREE.Group(), 'crustStack');
   const crustMat = m('crust', 'dough');
+  const rnd = rng(11);
   for (let i = 0; i < crustCount; i++) {
-    const c = named(cyl(crustRadius, crustRadius, crustThickness, crustMat, 32), `crust${i}`);
-    crusts.add(at(c, 0, clearance + 0.06 + i * (crustThickness + 0.005), 0));
+    // cada massa é ligeiramente diferente: tom, raio, rotação e posição (partilham as texturas)
+    const mat = crustMat.clone();
+    mat.color.offsetHSL((rnd() - 0.5) * 0.02, (rnd() - 0.5) * 0.08, (rnd() - 0.5) * 0.06);
+    const r = crustRadius * (0.97 + rnd() * 0.05);
+    const c = named(cyl(r, r, crustThickness, mat, 32), `crust${i}`);
+    c.rotation.y = rnd() * Math.PI * 2;
+    crusts.add(at(c, (rnd() - 0.5) * 0.016, clearance + 0.06 + i * (crustThickness + 0.005), (rnd() - 0.5) * 0.016));
   }
   g.add(crusts);
 
@@ -312,6 +376,103 @@ export function woodOven(p, m) {
 
   // chaminé
   g.add(at(cyl(0.08, 0.1, 0.6, m('chimney', 'darkSteel'), 20), 0, baseHeight + radius * domeH + 0.15, radius * 0.45));
+  return g;
+}
+
+/** Recipiente de inox com um monte de ingrediente (material "food"). */
+export function ingredientBin(p, m) {
+  const { width = 0.32, depth = 0.22, height = 0.1 } = p;
+  const g = new THREE.Group();
+  const steel = m('body', 'stainless');
+  const t = 0.012;
+  g.add(at(box(width, t, depth, steel), 0, t / 2, 0));
+  g.add(at(box(width, height, t, steel), 0, height / 2, depth / 2 - t / 2));
+  g.add(at(box(width, height, t, steel), 0, height / 2, -depth / 2 + t / 2));
+  g.add(at(box(t, height, depth, steel), width / 2 - t / 2, height / 2, 0));
+  g.add(at(box(t, height, depth, steel), -width / 2 + t / 2, height / 2, 0));
+  // monte (meia esfera achatada) a sair do recipiente
+  const mound = new THREE.Mesh(new THREE.SphereGeometry(1, 24, 10, 0, Math.PI * 2, 0, Math.PI / 2), m('food', 'ingredientTomato'));
+  mound.scale.set(width / 2 - 0.02, height * 0.85, depth / 2 - 0.02);
+  g.add(at(mound, 0, t, 0));
+  return g;
+}
+
+/**
+ * Pizza (para decorar a linha de montagem). layers: 'sauce', 'cheese', 'ham', 'mushroom', 'olive', 'basil'.
+ * Sem camadas = só a massa. Os elementos repetidos usam InstancedMesh (1 draw call por tipo).
+ */
+export function pizza(p, m) {
+  const { radius = 0.2, layers = [], seed = 1 } = p;
+  const rnd = rng(seed);
+  const g = new THREE.Group();
+  const T = 0.02; // espessura da massa (igual à das massas do dispensador)
+  const crustMat = m('crust', 'dough');
+  g.add(at(cyl(radius, radius, T, crustMat, 40), 0, T / 2, 0));
+  const rim = new THREE.Mesh(new THREE.TorusGeometry(radius - 0.008, 0.012, 8, 48), crustMat);
+  rim.rotation.x = Math.PI / 2;
+  g.add(at(rim, 0, T, 0));
+
+  let y = T;
+  const R = radius - 0.06; // raio útil para os ingredientes
+  if (layers.includes('sauce')) {
+    g.add(at(cyl(radius - 0.025, radius - 0.025, 0.004, m('sauce', 'pizzaSauce'), 40), 0, y + 0.002, 0));
+    y += 0.004;
+  }
+  if (layers.includes('cheese')) {
+    const cheese = m('cheese', 'pizzaCheese');
+    g.add(at(cyl(radius - 0.04, radius - 0.04, 0.005, cheese, 40), 0, y + 0.0025, 0));
+    y += 0.005;
+    g.add(instanced(new THREE.SphereGeometry(1, 12, 8), cheese, scatter(10, R, rnd, y, [0.05, 0.006, 0.05], 0.2)));
+  }
+  if (layers.includes('ham')) {
+    g.add(instanced(new THREE.CylinderGeometry(1, 1, 1, 16), m('ham', 'toppingHam'), scatter(7, R, rnd, y + 0.003, [0.034, 0.004, 0.034], 0.3)));
+  }
+  if (layers.includes('mushroom')) {
+    g.add(instanced(new THREE.SphereGeometry(1, 12, 8), m('mushroom', 'toppingMushroom'), scatter(7, R, rnd, y + 0.006, [0.022, 0.012, 0.022], 1.1)));
+  }
+  if (layers.includes('olive')) {
+    g.add(instanced(new THREE.TorusGeometry(0.013, 0.006, 8, 14), m('olive', 'toppingOlive'), scatter(9, R, rnd, y + 0.007, [1, 1, 1], 2.0, Math.PI / 2)));
+  }
+  if (layers.includes('basil')) {
+    g.add(instanced(new THREE.SphereGeometry(1, 12, 8), m('basil', 'toppingBasil'), scatter(5, R - 0.02, rnd, y + 0.012, [0.032, 0.004, 0.02], 0.7)));
+  }
+  return g;
+}
+
+/** Pilha de lenha (troncos deitados ao longo de Z, empilhados em fiadas desencontradas). Origem: base, centro. */
+export function logPile(p, m) {
+  const { width = 1.5, height = 0.7, length = 0.5, logRadius = 0.065, seed = 7 } = p;
+  const rnd = rng(seed);
+  const g = new THREE.Group();
+  const geo = new THREE.CylinderGeometry(1, 1, 1, 14);
+  geo.rotateX(Math.PI / 2); // eixo do tronco ao longo de Z (as pontas ficam viradas para a frente)
+  const o = new THREE.Object3D();
+  const d = logRadius * 2.05;
+  const matrices = [];
+  for (let row = 0; ; row++) {
+    const y = logRadius + row * d * 0.88;
+    if (y + logRadius > height) break;
+    const offset = (row % 2) * (d / 2);
+    const cols = Math.floor((width - offset) / d);
+    for (let c = 0; c < cols; c++) {
+      const rad = logRadius * (0.85 + rnd() * 0.25);
+      o.position.set(-width / 2 + d / 2 + offset + c * d + (rnd() - 0.5) * 0.01, y, (rnd() - 0.5) * 0.04);
+      o.rotation.set(0, (rnd() - 0.5) * 0.08, 0);
+      o.scale.set(rad, rad, length * (0.92 + rnd() * 0.12));
+      o.updateMatrix();
+      matrices.push(o.matrix.clone());
+    }
+  }
+  g.add(instanced(geo, m('log', 'logWood'), matrices));
+  return g;
+}
+
+/** Tira de LED de teto (origem no teto; o painel emissivo fica logo por baixo). */
+export function ledStrip(p, m) {
+  const { length = 4, width = 0.08 } = p;
+  const g = new THREE.Group();
+  g.add(at(box(length + 0.04, 0.012, width + 0.04, m('frame', 'darkSteel')), 0, -0.006, 0));
+  g.add(at(box(length, 0.004, width, m('led', 'ledStrip')), 0, -0.014, 0));
   return g;
 }
 
@@ -523,4 +684,8 @@ export const BUILDERS = {
   wallShelf,
   pendantLamp,
   cookingTool,
+  ingredientBin,
+  pizza,
+  logPile,
+  ledStrip,
 };

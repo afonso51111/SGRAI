@@ -16,6 +16,16 @@ function buildRoom(k, mats) {
   floor.name = 'floor';
   room.add(floor);
 
+  // teto: plano virado para baixo (FrontSide) — visto de cima fica invisível, tal como as paredes
+  if (k.ceilingMaterial) {
+    const ceiling = new THREE.Mesh(new THREE.PlaneGeometry(width, depth), mats.get(k.ceilingMaterial));
+    ceiling.rotation.x = Math.PI / 2;
+    ceiling.position.y = height;
+    ceiling.receiveShadow = true;
+    ceiling.name = 'ceiling';
+    room.add(ceiling);
+  }
+
   // paredes de uma só face (FrontSide virada para dentro): de fora vê-se para dentro da cozinha
   const walls = [
     { name: 'wallBack', w: width, pos: [0, height / 2, -depth / 2], rotY: 0 },

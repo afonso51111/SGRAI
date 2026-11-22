@@ -2,10 +2,12 @@ import * as THREE from 'three';
 
 const deg = THREE.MathUtils.degToRad;
 
+// criar luzes do JSON (US5)
 export function buildLights(defs, scene) {
   const result = [];
   for (const def of defs) {
     let light;
+    // tipo de luz
     switch (def.type) {
       case 'ambient':
         light = new THREE.AmbientLight(def.color, def.intensity);
@@ -31,10 +33,12 @@ export function buildLights(defs, scene) {
         continue;
     }
 
+    // posição e estado inicial
     light.name = def.name;
     if (def.position) light.position.set(...def.position);
     light.visible = def.on ?? true;
 
+    // configurar sombras
     if (def.castShadow && light.shadow) {
       light.castShadow = true;
       const size = def.shadowMapSize ?? 1024;

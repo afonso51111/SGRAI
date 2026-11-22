@@ -1,13 +1,16 @@
 import * as THREE from 'three';
 import GUI from 'three/addons/libs/lil-gui.module.min.js';
 
+// máximos dos sliders
 const INTENSITY_MAX = { ambient: 3, hemisphere: 3, directional: 5, spot: 120, point: 20 };
 
 
+// painel lil-gui (US6)
 export function createLightsGui(lights) {
   const gui = new GUI({ title: 'Iluminação' });
 
   for (const { def, light } of lights) {
+    // uma pasta por luz
     const folder = gui.addFolder(def.name);
     const state = {
       on: light.visible,
@@ -17,6 +20,7 @@ export function createLightsGui(lights) {
       penumbra: light.penumbra ?? 0,
     };
 
+    // cor e intensidade
     const controls = [];
     controls.push(folder.addColor(state, 'color').name('Cor').onChange((v) => light.color.set(v)));
     controls.push(
@@ -25,6 +29,7 @@ export function createLightsGui(lights) {
         .name('Intensidade')
         .onChange((v) => (light.intensity = v)),
     );
+    // ângulo e penumbra (spots)
     if (light.isSpotLight) {
       controls.push(
         folder
@@ -35,7 +40,9 @@ export function createLightsGui(lights) {
       controls.push(folder.add(state, 'penumbra', 0, 1, 0.01).name('Penumbra').onChange((v) => (light.penumbra = v)));
     }
 
+    // bloquear controlos se desligada
     const setEnabled = (on) => controls.forEach((c) => (on ? c.enable() : c.disable()));
+    // checkbox ligar/desligar
     const toggle = folder
       .add(state, 'on')
       .name('Ligada')

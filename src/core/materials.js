@@ -1,8 +1,10 @@
 import * as THREE from 'three';
 
+// tipos de mapas suportados
 const MAP_SLOTS = ['map', 'normalMap', 'bumpMap', 'roughnessMap', 'metalnessMap', 'aoMap', 'emissiveMap'];
 const SRGB_SLOTS = new Set(['map', 'emissiveMap']);
 
+// materiais a partir do JSON (US4)
 export class MaterialLibrary {
   constructor(definitions, renderer, baseUrl = './') {
     this.defs = definitions;
@@ -14,6 +16,7 @@ export class MaterialLibrary {
     this.missing = [];
   }
 
+  // carregar todas as texturas
   async preload() {
     const urls = new Set();
     for (const def of Object.values(this.defs)) {
@@ -35,6 +38,7 @@ export class MaterialLibrary {
     }
   }
 
+  // textura com repetição
   texture(url, slot, repeat = [1, 1], rotation = 0) {
     const base = this.images.get(url);
     if (!base) return null;
@@ -52,6 +56,7 @@ export class MaterialLibrary {
     return this.textures.get(key);
   }
 
+  // criar material pelo nome
   get(name) {
     if (this.materials.has(name)) return this.materials.get(name);
     const def = this.defs[name];
@@ -75,6 +80,7 @@ export class MaterialLibrary {
       flatShading: def.flatShading ?? false,
     });
 
+    // aplicar mapas ao material
     for (const slot of MAP_SLOTS) {
       const url = def.maps?.[slot];
       if (url) mat[slot] = this.texture(url, slot, def.repeat, def.textureRotation ?? 0);

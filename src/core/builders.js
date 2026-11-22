@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 
 
+// ajudantes de geometria
 function box(w, h, d, mat) {
   return new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat);
 }
@@ -24,6 +25,7 @@ function named(obj, name) {
 }
 
 
+// números aleatórios repetíveis
 function rng(seed = 1) {
   let a = seed >>> 0;
   return () => {
@@ -36,6 +38,7 @@ function rng(seed = 1) {
 }
 
 
+// muitas peças iguais
 function instanced(geo, mat, matrices) {
   const im = new THREE.InstancedMesh(geo, mat, matrices.length);
   matrices.forEach((mx, i) => im.setMatrixAt(i, mx));
@@ -62,6 +65,7 @@ function scatter(count, R, rnd, y, [sx, sy, sz], phase = 0, tiltX = 0) {
 }
 
 
+// botões dos equipamentos
 function knobs(g, count, width, y, z, mat) {
   for (let i = 0; i < count; i++) {
     const x = -width / 2 + (width * (i + 1)) / (count + 1);
@@ -71,12 +75,14 @@ function knobs(g, count, width, y, z, mat) {
   }
 }
 
+// corpo base de equipamento
 function applianceBody(g, w, h, d, m) {
   g.add(at(box(w - 0.04, 0.1, d - 0.08, m('kick', 'darkSteel')), 0, 0.05, -0.02));
   g.add(at(box(w, h - 0.1, d, m('body', 'stainless')), 0, 0.1 + (h - 0.1) / 2, 0));
 }
 
 
+// bancada com portas
 export function counter(p, m) {
   const {
     width = 2,
@@ -114,6 +120,7 @@ export function counter(p, m) {
   return g;
 }
 
+// mesa de preparação
 export function table(p, m) {
   const { width = 2, depth = 1, height = 0.9, topThickness = 0.05 } = p;
   const g = new THREE.Group();
@@ -129,6 +136,7 @@ export function table(p, m) {
 }
 
 
+// plataforma de receção (US3)
 export function receivingPlatform(p, m) {
   const { width = 0.6, depth = 0.6, height = 0.06, rim = 0.03 } = p;
   const g = new THREE.Group();
@@ -141,6 +149,7 @@ export function receivingPlatform(p, m) {
   return g;
 }
 
+// dispensador de massas (US3)
 export function dispenser(p, m) {
   const {
     tubeRadius = 0.24,
@@ -198,6 +207,7 @@ export function dispenser(p, m) {
   return g;
 }
 
+// tapete rolante (US3)
 export function conveyor(p, m) {
   const { length = 5, width = 0.5, height = 0.18, rollerRadius = 0.07 } = p;
   const g = new THREE.Group();
@@ -222,6 +232,7 @@ export function conveyor(p, m) {
   return g;
 }
 
+// braço robótico (US3)
 export function roboticArm(p, m) {
   const {
     upperLength = 0.45,
@@ -272,6 +283,7 @@ export function roboticArm(p, m) {
   return g;
 }
 
+// forno a lenha (US3)
 export function woodOven(p, m) {
   const {
     radius = 0.7,
@@ -341,6 +353,7 @@ export function woodOven(p, m) {
   return g;
 }
 
+// recipiente de ingrediente
 export function ingredientBin(p, m) {
   const { width = 0.32, depth = 0.22, height = 0.1 } = p;
   const g = new THREE.Group();
@@ -358,6 +371,7 @@ export function ingredientBin(p, m) {
   return g;
 }
 
+// pizza
 export function pizza(p, m) {
   const { radius = 0.2, layers = [], seed = 1 } = p;
   const rnd = rng(seed);
@@ -396,6 +410,7 @@ export function pizza(p, m) {
   return g;
 }
 
+// pilha de lenha
 export function logPile(p, m) {
   const { width = 1.5, height = 0.7, length = 0.5, logRadius = 0.065, seed = 7 } = p;
   const rnd = rng(seed);
@@ -423,6 +438,7 @@ export function logPile(p, m) {
   return g;
 }
 
+// fita LED
 export function ledStrip(p, m) {
   const { length = 4, width = 0.08 } = p;
   const g = new THREE.Group();
@@ -432,6 +448,7 @@ export function ledStrip(p, m) {
 }
 
 
+// fritadeira
 export function deepFryer(p, m) {
   const { width = 0.8, depth = 0.8, height = 0.9 } = p;
   const g = new THREE.Group();
@@ -452,6 +469,7 @@ export function deepFryer(p, m) {
   return g;
 }
 
+// chapa
 export function griddle(p, m) {
   const { width = 1, depth = 0.8, height = 0.9 } = p;
   const g = new THREE.Group();
@@ -464,6 +482,7 @@ export function griddle(p, m) {
   return g;
 }
 
+// grelhador
 export function grill(p, m) {
   const { width = 1, depth = 0.8, height = 0.9, bars = 14 } = p;
   const g = new THREE.Group();
@@ -481,6 +500,7 @@ export function grill(p, m) {
   return g;
 }
 
+// exaustor
 export function exhaustHood(p, m) {
   const { width = 3, depth = 1, height = 0.5, topScale = 0.45, ductHeight = 0.6 } = p;
   const g = new THREE.Group();
@@ -501,6 +521,7 @@ export function exhaustHood(p, m) {
   return g;
 }
 
+// frigorífico
 export function refrigerator(p, m) {
   const { width = 1.3, depth = 0.8, height = 2, doors = 2 } = p;
   const g = new THREE.Group();
@@ -519,6 +540,7 @@ export function refrigerator(p, m) {
   return g;
 }
 
+// máquina da loiça
 export function dishwasher(p, m) {
   const { width = 0.6, depth = 0.65, height = 0.85 } = p;
   const g = new THREE.Group();
@@ -532,6 +554,7 @@ export function dishwasher(p, m) {
   return g;
 }
 
+// prateleira de parede
 export function wallShelf(p, m) {
   const { width = 1.6, depth = 0.3, levels = 2, spacing = 0.4 } = p;
   const g = new THREE.Group();
@@ -544,6 +567,7 @@ export function wallShelf(p, m) {
   return g;
 }
 
+// candeeiro de teto
 export function pendantLamp(p, m) {
   const { cord = 0.6, shadeRadius = 0.22 } = p;
   const g = new THREE.Group();
@@ -554,6 +578,7 @@ export function pendantLamp(p, m) {
   return g;
 }
 
+// utensílios de cozinha
 export function cookingTool(p, m) {
   const g = new THREE.Group();
   switch (p.kind) {
@@ -618,6 +643,7 @@ export function cookingTool(p, m) {
   return g;
 }
 
+// lista de construtores
 export const BUILDERS = {
   counter,
   table,

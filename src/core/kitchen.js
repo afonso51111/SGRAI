@@ -4,17 +4,20 @@ import { BUILDERS } from './builders.js';
 
 const deg = THREE.MathUtils.degToRad;
 
+// chão, teto e paredes
 function buildRoom(k, mats) {
   const room = new THREE.Group();
   room.name = 'room';
   const { width, depth, height } = k;
 
+  // chão
   const floor = new THREE.Mesh(new THREE.PlaneGeometry(width, depth), mats.get(k.floorMaterial));
   floor.rotation.x = -Math.PI / 2;
   floor.receiveShadow = true;
   floor.name = 'floor';
   room.add(floor);
 
+  // teto (opcional)
   if (k.ceilingMaterial) {
     const ceiling = new THREE.Mesh(new THREE.PlaneGeometry(width, depth), mats.get(k.ceilingMaterial));
     ceiling.rotation.x = Math.PI / 2;
@@ -24,6 +27,7 @@ function buildRoom(k, mats) {
     room.add(ceiling);
   }
 
+  // quatro paredes
   const walls = [
     { name: 'wallBack', w: width, pos: [0, height / 2, -depth / 2], rotY: 0 },
     { name: 'wallFront', w: width, pos: [0, height / 2, depth / 2], rotY: Math.PI },
@@ -41,6 +45,7 @@ function buildRoom(k, mats) {
   return room;
 }
 
+// posição, rotação e escala
 function applyTransform(obj, def) {
   if (def.position) obj.position.set(...def.position);
   if (def.rotation) obj.rotation.set(deg(def.rotation[0]), deg(def.rotation[1]), deg(def.rotation[2]));
@@ -50,6 +55,7 @@ function applyTransform(obj, def) {
   }
 }
 
+// ligar sombras nos objetos
 function setShadows(obj, def) {
   const cast = def.castShadow ?? true;
   const receive = def.receiveShadow ?? true;
@@ -62,6 +68,7 @@ function setShadows(obj, def) {
 }
 
 
+// montar a cozinha do JSON
 export async function buildKitchen(layout, mats, baseUrl = './') {
   const kitchen = new THREE.Group();
   kitchen.name = 'kitchen';
@@ -71,8 +78,10 @@ export async function buildKitchen(layout, mats, baseUrl = './') {
   const gltfCache = new Map();
   const byId = {};
 
+  // percorrer objetos do JSON
   for (const def of layout.objects) {
     let obj;
+    // modelo importado (.glb)
     if (def.type === 'model') {
       const model = layout.models?.[def.model];
       if (!model) {
@@ -91,6 +100,7 @@ export async function buildKitchen(layout, mats, baseUrl = './') {
         continue;
       }
     } else {
+      // modelo procedural (builders.js)
       const build = BUILDERS[def.type];
       if (!build) {
         console.warn(`[cozinha] tipo de objeto desconhecido: ${def.type}`);
@@ -100,6 +110,7 @@ export async function buildKitchen(layout, mats, baseUrl = './') {
       obj = build(def.params ?? {}, m);
     }
 
+    // colocar na cena
     obj.name = def.id ?? def.type;
     obj.userData.def = def;
     applyTransform(obj, def);

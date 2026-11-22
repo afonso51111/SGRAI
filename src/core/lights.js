@@ -2,11 +2,6 @@ import * as THREE from 'three';
 
 const deg = THREE.MathUtils.degToRad;
 
-/**
- * Cria as luzes definidas em layout.lights.
- * Tipos: "ambient", "hemisphere", "spot", "point", "directional".
- * Devolve [{ def, light }] para a GUI (US6).
- */
 export function buildLights(defs, scene) {
   const result = [];
   for (const def of defs) {

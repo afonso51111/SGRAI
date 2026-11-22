@@ -4,7 +4,6 @@ import { BUILDERS } from './builders.js';
 
 const deg = THREE.MathUtils.degToRad;
 
-/** Chão e paredes da cozinha a partir de layout.kitchen. */
 function buildRoom(k, mats) {
   const room = new THREE.Group();
   room.name = 'room';
@@ -16,7 +15,6 @@ function buildRoom(k, mats) {
   floor.name = 'floor';
   room.add(floor);
 
-  // teto: plano virado para baixo (FrontSide) — visto de cima fica invisível, tal como as paredes
   if (k.ceilingMaterial) {
     const ceiling = new THREE.Mesh(new THREE.PlaneGeometry(width, depth), mats.get(k.ceilingMaterial));
     ceiling.rotation.x = Math.PI / 2;
@@ -26,7 +24,6 @@ function buildRoom(k, mats) {
     room.add(ceiling);
   }
 
-  // paredes de uma só face (FrontSide virada para dentro): de fora vê-se para dentro da cozinha
   const walls = [
     { name: 'wallBack', w: width, pos: [0, height / 2, -depth / 2], rotY: 0 },
     { name: 'wallFront', w: width, pos: [0, height / 2, depth / 2], rotY: Math.PI },
@@ -64,12 +61,7 @@ function setShadows(obj, def) {
   });
 }
 
-/**
- * Constrói a cozinha inteira a partir do JSON.
- * Cada objeto em layout.objects é:
- *   - procedural: { "type": "<construtor>", "params": {...}, "materials": { "<parte>": "<material>" } }
- *   - importado:  { "type": "model", "model": "<chave em layout.models>" }  (URL vem do JSON)
- */
+
 export async function buildKitchen(layout, mats, baseUrl = './') {
   const kitchen = new THREE.Group();
   kitchen.name = 'kitchen';
@@ -91,7 +83,7 @@ export async function buildKitchen(layout, mats, baseUrl = './') {
         if (!gltfCache.has(model.url)) gltfCache.set(model.url, gltfLoader.loadAsync(baseUrl + model.url));
         obj = (await gltfCache.get(model.url)).scene.clone(true);
         if (model.scale) obj.scale.setScalar(model.scale);
-        const wrapper = new THREE.Group(); // para a escala do modelo não se misturar com a do objeto
+        const wrapper = new THREE.Group(); 
         wrapper.add(obj);
         obj = wrapper;
       } catch (e) {

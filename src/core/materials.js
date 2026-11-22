@@ -1,26 +1,19 @@
 import * as THREE from 'three';
 
-// Mapas de textura suportados no JSON. Os de cor usam espaço de cor sRGB.
 const MAP_SLOTS = ['map', 'normalMap', 'bumpMap', 'roughnessMap', 'metalnessMap', 'aoMap', 'emissiveMap'];
 const SRGB_SLOTS = new Set(['map', 'emissiveMap']);
 
-/**
- * Cria os materiais a partir da secção "materials" do kitchen.json.
- * Todas as propriedades (cor, rugosidade, metalicidade, URLs dos mapas, repetição…)
- * vêm do JSON — nada está escrito no código.
- */
 export class MaterialLibrary {
   constructor(definitions, renderer, baseUrl = './') {
     this.defs = definitions;
     this.baseUrl = baseUrl;
     this.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
-    this.images = new Map(); // url -> Texture original (ou null se falhou)
-    this.textures = new Map(); // url|repeat -> Texture com a repetição certa
+    this.images = new Map(); 
+    this.textures = new Map(); 
     this.materials = new Map();
     this.missing = [];
   }
 
-  /** Carrega todas as imagens antes de construir a cena (evita objetos pretos enquanto carregam). */
   async preload() {
     const urls = new Set();
     for (const def of Object.values(this.defs)) {
@@ -47,7 +40,7 @@ export class MaterialLibrary {
     if (!base) return null;
     const key = `${url}|${slot}|${repeat.join(',')}|${rotation}`;
     if (!this.textures.has(key)) {
-      const t = base.clone(); // partilha a imagem, só muda a repetição
+      const t = base.clone(); 
       t.wrapS = t.wrapT = THREE.RepeatWrapping;
       t.repeat.set(repeat[0], repeat[1]);
       t.rotation = rotation;

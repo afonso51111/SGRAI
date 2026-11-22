@@ -1,19 +1,5 @@
 import * as THREE from 'three';
 
-/*
- * Modelos criados proceduralmente.
- *
- * Convenções (iguais para todos os construtores):
- *  - unidade = 1 metro;
- *  - a origem de cada modelo está no centro da base (y = 0 é onde o objeto assenta);
- *  - a frente do modelo está virada para +Z (a rotação no JSON roda-o depois);
- *  - p = parâmetros do objeto (do JSON), m(parte, materialPorDefeito) = material dessa parte.
- *
- * As peças que vão ser animadas no sprint 3 têm nome (obj.name) para serem
- * encontradas com group.getObjectByName(...).
- */
-
-// ---------- ajudantes ----------
 
 function box(w, h, d, mat) {
   return new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat);
@@ -37,7 +23,7 @@ function named(obj, name) {
   return obj;
 }
 
-/** Gerador pseudo-aleatório determinístico (a mesma semente dá sempre a mesma cena). */
+
 function rng(seed = 1) {
   let a = seed >>> 0;
   return () => {
@@ -49,7 +35,7 @@ function rng(seed = 1) {
   };
 }
 
-/** Muitas cópias da mesma geometria num único draw call. `matrices` = lista de THREE.Matrix4. */
+
 function instanced(geo, mat, matrices) {
   const im = new THREE.InstancedMesh(geo, mat, matrices.length);
   matrices.forEach((mx, i) => im.setMatrixAt(i, mx));
@@ -57,10 +43,7 @@ function instanced(geo, mat, matrices) {
   return im;
 }
 
-/**
- * Espalha `count` elementos em espiral (ângulo de ouro) num disco de raio R.
- * size = escala [x, y, z]; tiltX roda cada elemento (ex.: PI/2 para deitar um torus).
- */
+
 function scatter(count, R, rnd, y, [sx, sy, sz], phase = 0, tiltX = 0) {
   const o = new THREE.Object3D();
   o.rotation.order = 'YXZ'; // primeiro deita (tiltX), depois roda sobre o eixo vertical
@@ -78,7 +61,7 @@ function scatter(count, R, rnd, y, [sx, sy, sz], phase = 0, tiltX = 0) {
   return out;
 }
 
-/** Botões rotativos na frente de um equipamento. */
+
 function knobs(g, count, width, y, z, mat) {
   for (let i = 0; i < count; i++) {
     const x = -width / 2 + (width * (i + 1)) / (count + 1);
@@ -88,13 +71,11 @@ function knobs(g, count, width, y, z, mat) {
   }
 }
 
-/** Corpo base de equipamento de cozinha (caixa + rodapé). */
 function applianceBody(g, w, h, d, m) {
   g.add(at(box(w - 0.04, 0.1, d - 0.08, m('kick', 'darkSteel')), 0, 0.05, -0.02));
   g.add(at(box(w, h - 0.1, d, m('body', 'stainless')), 0, 0.1 + (h - 0.1) / 2, 0));
 }
 
-// ---------- mobiliário ----------
 
 export function counter(p, m) {
   const {
@@ -103,7 +84,7 @@ export function counter(p, m) {
     height = 0.9,
     topThickness = 0.05,
     doors = Math.max(1, Math.round(width / 0.6)),
-    niche = null, // { center, width }: nicho aberto (sem corpo nem portas), em x local — usado para a lenha
+    niche = null, 
   } = p;
   const g = new THREE.Group();
   const bodyH = height - topThickness - 0.1;
@@ -120,7 +101,6 @@ export function counter(p, m) {
   }
   g.add(at(box(width + 0.02, topThickness, depth, m('top', 'woodCounter')), 0, height - topThickness / 2, 0));
 
-  // portas e puxadores
   const doorW = width / doors;
   const handleMat = m('handle', 'darkSteel');
   for (let i = 0; i < doors; i++) {
@@ -148,7 +128,6 @@ export function table(p, m) {
   return g;
 }
 
-// ---------- linha de montagem (US3) ----------
 
 export function receivingPlatform(p, m) {
   const { width = 0.6, depth = 0.6, height = 0.06, rim = 0.03 } = p;
@@ -166,8 +145,8 @@ export function dispenser(p, m) {
   const {
     tubeRadius = 0.24,
     tubeHeight = 0.8,
-    clearance = 0.45, // altura entre a bancada e o fundo do dispensador
-    postOffset = 0.7, // distância do poste (atrás) ao centro do tubo
+    clearance = 0.45, 
+    postOffset = 0.7,
     crustCount = 10,
     crustRadius = 0.2,
     crustThickness = 0.02,
@@ -177,11 +156,9 @@ export function dispenser(p, m) {
   const body = m('body', 'stainless');
   const topY = clearance + tubeHeight;
 
-  // poste e braço de suporte
   g.add(at(box(0.08, topY + 0.15, 0.08, frame), 0, (topY + 0.15) / 2, -postOffset));
   g.add(at(box(0.08, 0.08, postOffset, frame), 0, topY + 0.1, -postOffset / 2));
 
-  // gaiola do tubo (anéis + varões) para se verem as massas lá dentro
   const tube = named(new THREE.Group(), 'tube');
   for (const y of [clearance + 0.04, clearance + tubeHeight / 2, topY]) {
     const ring = new THREE.Mesh(new THREE.TorusGeometry(tubeRadius, 0.012, 8, 40), body);
@@ -196,7 +173,6 @@ export function dispenser(p, m) {
   tube.add(at(cyl(tubeRadius * 1.35, tubeRadius, 0.15, body, 32, true), 0, topY + 0.075, 0));
   g.add(tube);
 
-  // pilha de massas (o sprint 3 vai largá-las uma a uma)
   const crusts = named(new THREE.Group(), 'crustStack');
   const crustMat = m('crust', 'dough');
   const rnd = rng(11);
@@ -211,7 +187,6 @@ export function dispenser(p, m) {
   }
   g.add(crusts);
 
-  // comporta inferior em duas metades com charneira (pivots) — abre no sprint 3
   for (const side of [-1, 1]) {
     const pivot = named(new THREE.Group(), side < 0 ? 'hatchLeft' : 'hatchRight');
     pivot.position.set(side * tubeRadius, clearance + 0.02, 0);
@@ -229,13 +204,11 @@ export function conveyor(p, m) {
   const frame = m('frame', 'stainless');
   const dark = m('motor', 'darkSteel');
 
-  // calhas laterais
   for (const s of [-1, 1]) g.add(at(box(length, height * 0.75, 0.03, frame), 0, height * 0.55, s * (width / 2 + 0.03)));
   // pés
   for (const x of [-length / 2 + 0.15, 0, length / 2 - 0.15]) {
     for (const s of [-1, 1]) g.add(at(box(0.05, height * 0.2, 0.05, frame), x, height * 0.1, s * (width / 2 + 0.03)));
   }
-  // rolos nas pontas (rodam no sprint 3)
   [-1, 1].forEach((s, i) => {
     const r = named(cyl(rollerRadius, rollerRadius, width, dark, 24), `roller${i}`);
     r.rotation.x = Math.PI / 2;
@@ -253,7 +226,7 @@ export function roboticArm(p, m) {
   const {
     upperLength = 0.45,
     foreLength = 0.4,
-    shoulderAngle = 30, // graus (inclinação para a frente)
+    shoulderAngle = 30, 
     elbowAngle = 80,
   } = p;
   const deg = THREE.MathUtils.degToRad;
@@ -263,7 +236,6 @@ export function roboticArm(p, m) {
 
   g.add(at(cyl(0.13, 0.15, 0.08, m('base', 'darkSteel'), 32), 0, 0.04, 0));
 
-  // hierarquia: turret -> shoulder -> elbow -> wrist (cada um é um pivot a animar no sprint 3)
   const turret = named(new THREE.Group(), 'turret');
   turret.position.y = 0.08;
   turret.add(at(cyl(0.09, 0.1, 0.12, armMat, 24), 0, 0.06, 0));
@@ -285,17 +257,14 @@ export function roboticArm(p, m) {
   elbow.add(at(box(0.065, foreLength, 0.065, armMat), 0, foreLength / 2, 0));
   shoulder.add(elbow);
 
-  // pulso: mantém a cabeça sempre a apontar para baixo
   const wrist = named(new THREE.Group(), 'wrist');
   wrist.position.y = foreLength;
   wrist.rotation.x = Math.PI - deg(shoulderAngle + elbowAngle);
   wrist.add(sphere(0.045, jointMat));
-  // cabeça doseadora: depósito + bico (o +Y local aponta para baixo)
   const head = m('head', 'stainless');
   wrist.add(at(cyl(0.075, 0.075, 0.1, head, 24), 0, -0.02, 0));
   wrist.add(at(cyl(0.02, 0.075, 0.1, head, 24), 0, 0.08, 0));
   wrist.add(named(at(cyl(0.012, 0.012, 0.04, jointMat, 12), 0, 0.15, 0), 'nozzle'));
-  // tampa colorida com a cor do ingrediente deste braço
   wrist.add(at(cyl(0.07, 0.07, 0.025, m('ingredient', 'ingredientTomato'), 24), 0, -0.08, 0));
   elbow.add(wrist);
 
@@ -309,8 +278,8 @@ export function woodOven(p, m) {
     baseWidth = 1.6,
     baseDepth = 1.5,
     baseHeight = 0.12,
-    serviceMouth = true, // segunda abertura, de lado, para tirar pizzas à mão
-    serviceDoorAngle = 0, // graus: 0 = porta fechada
+    serviceMouth = true, 
+    serviceDoorAngle = 0, 
   } = p;
   const g = new THREE.Group();
   const brick = m('base', 'ovenBrick');
@@ -326,7 +295,6 @@ export function woodOven(p, m) {
   d.scale.y = domeH;
   g.add(at(d, 0, baseHeight, 0));
 
-  /** Entrada em arco com o fogo visível lá dentro, virada para +Z e depois rodada `angle` em Y. */
   const buildMouth = (name, angle) => {
     const pivot = new THREE.Group();
     pivot.rotation.y = angle;
@@ -335,7 +303,6 @@ export function woodOven(p, m) {
     arch.rotation.x = Math.PI / 2;
     pivot.add(at(arch, 0, baseHeight + mouthH, front));
 
-    // abertura (plano emissivo com o fogo)
     const mouth = named(new THREE.Group(), name);
     mouth.position.set(0, baseHeight + 0.02, front + 0.181);
     const fire = named(new THREE.Mesh(new THREE.PlaneGeometry(mouthW - 0.12, mouthH * 0.85), m('fire', 'fire')), name + 'Fire');
@@ -349,15 +316,11 @@ export function woodOven(p, m) {
     return mouth;
   };
 
-  // entrada principal (+Z): é aqui que o tapete entrega as pizzas
   buildMouth('mouth', 0);
 
   if (serviceMouth) {
-    // abertura de serviço (+X): acesso manual com a pá, sem parar a linha.
-    // No sprint 3 também pode ser a saída das pizzas já cozidas.
     const service = buildMouth('serviceMouth', Math.PI / 2);
 
-    // porta metálica com charneira do lado esquerdo — "serviceDoor" é o pivot a animar
     const doorW = mouthW - 0.08;
     const doorH = mouthH + (mouthW - 0.12) / 2;
     const door = named(new THREE.Group(), 'serviceDoor');
@@ -369,17 +332,15 @@ export function woodOven(p, m) {
     door.add(at(handle, doorW * 0.75, doorH * 0.45, 0.04));
     service.add(door);
 
-    // patamar de pedra à frente da abertura, para pousar a pizza ao tirá-la
     const ledge = box(0.3, 0.05, mouthW + 0.2, m('ledge', 'ovenBrick'));
     g.add(at(ledge, front + 0.18 + 0.15, baseHeight + 0.02 - 0.025, 0));
   }
 
-  // chaminé
+  
   g.add(at(cyl(0.08, 0.1, 0.6, m('chimney', 'darkSteel'), 20), 0, baseHeight + radius * domeH + 0.15, radius * 0.45));
   return g;
 }
 
-/** Recipiente de inox com um monte de ingrediente (material "food"). */
 export function ingredientBin(p, m) {
   const { width = 0.32, depth = 0.22, height = 0.1 } = p;
   const g = new THREE.Group();
@@ -397,15 +358,11 @@ export function ingredientBin(p, m) {
   return g;
 }
 
-/**
- * Pizza (para decorar a linha de montagem). layers: 'sauce', 'cheese', 'ham', 'mushroom', 'olive', 'basil'.
- * Sem camadas = só a massa. Os elementos repetidos usam InstancedMesh (1 draw call por tipo).
- */
 export function pizza(p, m) {
   const { radius = 0.2, layers = [], seed = 1 } = p;
   const rnd = rng(seed);
   const g = new THREE.Group();
-  const T = 0.02; // espessura da massa (igual à das massas do dispensador)
+  const T = 0.02; 
   const crustMat = m('crust', 'dough');
   g.add(at(cyl(radius, radius, T, crustMat, 40), 0, T / 2, 0));
   const rim = new THREE.Mesh(new THREE.TorusGeometry(radius - 0.008, 0.012, 8, 48), crustMat);
@@ -413,7 +370,7 @@ export function pizza(p, m) {
   g.add(at(rim, 0, T, 0));
 
   let y = T;
-  const R = radius - 0.06; // raio útil para os ingredientes
+  const R = radius - 0.06; 
   if (layers.includes('sauce')) {
     g.add(at(cyl(radius - 0.025, radius - 0.025, 0.004, m('sauce', 'pizzaSauce'), 40), 0, y + 0.002, 0));
     y += 0.004;
@@ -439,13 +396,12 @@ export function pizza(p, m) {
   return g;
 }
 
-/** Pilha de lenha (troncos deitados ao longo de Z, empilhados em fiadas desencontradas). Origem: base, centro. */
 export function logPile(p, m) {
   const { width = 1.5, height = 0.7, length = 0.5, logRadius = 0.065, seed = 7 } = p;
   const rnd = rng(seed);
   const g = new THREE.Group();
   const geo = new THREE.CylinderGeometry(1, 1, 1, 14);
-  geo.rotateX(Math.PI / 2); // eixo do tronco ao longo de Z (as pontas ficam viradas para a frente)
+  geo.rotateX(Math.PI / 2); 
   const o = new THREE.Object3D();
   const d = logRadius * 2.05;
   const matrices = [];
@@ -467,7 +423,6 @@ export function logPile(p, m) {
   return g;
 }
 
-/** Tira de LED de teto (origem no teto; o painel emissivo fica logo por baixo). */
 export function ledStrip(p, m) {
   const { length = 4, width = 0.08 } = p;
   const g = new THREE.Group();
@@ -476,7 +431,6 @@ export function ledStrip(p, m) {
   return g;
 }
 
-// ---------- equipamento de cozinha (US2) ----------
 
 export function deepFryer(p, m) {
   const { width = 0.8, depth = 0.8, height = 0.9 } = p;
@@ -531,14 +485,12 @@ export function exhaustHood(p, m) {
   const { width = 3, depth = 1, height = 0.5, topScale = 0.45, ductHeight = 0.6 } = p;
   const g = new THREE.Group();
   const body = m('body', 'stainless');
-  // pirâmide truncada de base retangular (cilindro de 4 lados rodado 45º e escalado)
   const geo = new THREE.CylinderGeometry(topScale * Math.SQRT1_2, Math.SQRT1_2, 1, 4, 1, true);
   geo.rotateY(Math.PI / 4);
   const hood = new THREE.Mesh(geo, m('hood', 'stainlessDouble'));
   hood.scale.set(width, height, depth);
   g.add(at(hood, 0, 0.12 + height / 2, 0));
   g.add(at(box(width, 0.12, depth, body), 0, 0.06, 0));
-  // filtros por baixo
   const filters = m('filter', 'darkSteel');
   const n = Math.max(2, Math.round(width / 0.5));
   for (let i = 0; i < n; i++) {
@@ -602,7 +554,6 @@ export function pendantLamp(p, m) {
   return g;
 }
 
-/** Utensílios de cozinha. p.kind escolhe o utensílio. */
 export function cookingTool(p, m) {
   const g = new THREE.Group();
   switch (p.kind) {
